@@ -1,0 +1,33 @@
+<mvc:View controllerName="i027737Controls.controller.App" 
+	xmlns:html="http://www.w3.org/1999/xhtml" 
+	xmlns:mvc="sap.ui.core.mvc"
+	xmlns:controls="i027737Controls.controls"
+	displayBlock="true" 
+	xmlns="sap.m">
+	<App>
+		<pages>
+			<Page title="{i18n>title}">
+				<content>
+					<controls:ChatDialog id="brianchat" 
+										title="Chat"
+										height="222px"
+										width="111px"
+										showCloseButton="true"
+										send="onSendPressed"
+										initialMessage="hello wha dup?"
+										placeHolder="Please chat to me"
+										userIcon="https://avatars1.githubusercontent.com/u/5350169"
+										robotIcon="https://edspace.american.edu/perf683/wp-content/uploads/sites/392/2015/10/robot.png"
+										buttonIcon="sap-icon://discussion">
+										
+					</controls:ChatDialog>
+					
+				</content>
+
+			</Page>
+		</pages>
+	</App>
+</mvc:View>
+
+
+						
