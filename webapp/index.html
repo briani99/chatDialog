@@ -5,24 +5,24 @@
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta charset="UTF-8">
 
-		<title>Controls</title>
+		<title>Node</title>
 
 		<script id="sap-ui-bootstrap"
-			src="../../resources/sap-ui-core.js"
+			src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
 			data-sap-ui-libs="sap.m"
 			data-sap-ui-theme="sap_belize"
 			data-sap-ui-compatVersion="edge"
-			data-sap-ui-resourceroots='{"i027737Controls": ""}'>
+			data-sap-ui-resourceroots='{"sap.i027737.Node": "./"}'>
 		</script>
 
-	
+		<link rel="stylesheet" type="text/css" href="css/style.css">
 
 		<script>
 			sap.ui.getCore().attachInit(function() {
 				new sap.m.Shell({
 					app: new sap.ui.core.ComponentContainer({
 						height : "100%",
-						name : "i027737Controls"
+						name : "sap.i027737.Node"
 					})
 				}).placeAt("content");
 			});

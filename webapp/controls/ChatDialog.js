@@ -13,7 +13,7 @@ sap.ui.define(
 	"sap/m/Title"
   ],
   function(Control, Button, IconPool, Dialog, List, FeedListItem, FeedInput, ResponsivePopover, VBox, ScrollContainer, Bar, Title) {
-	var ChatDialog = Control.extend("i027737Controls.controls.ChatDialog",{
+	var ChatDialog = Control.extend("sap.i027737.Node.controls.ChatDialog",{
 		
 		metadata : {
 			properties : {
@@ -48,8 +48,9 @@ sap.ui.define(
     	init : function () {
     		
     		//initialisation code, in this case, ensure css is imported
-	        var libraryPath = jQuery.sap.getModulePath("i027737Controls"); 
+	        var libraryPath = jQuery.sap.getModulePath("sap.i027737.Node"); 
 	        jQuery.sap.includeStyleSheet(libraryPath + "/css/bkChat.css"); 
+
 			
 			var oBtn = new Button(this.getId() + "-bkChatButton", {
 				press: this._onOpenChat.bind(this)
@@ -70,8 +71,15 @@ sap.ui.define(
 				showHeader: true,
 				resizable: true,
 				horizontalScrolling: false,
-				verticalScrolling: false
+				verticalScrolling: false,
+				onBeforeClose: this._saveDimensions
 			}).addStyleClass("sapUiTinyMargin");
+			
+			
+			
+			oRpop._afterAdjustPositionAndArrowHook = function(){
+				this._saveDimensions();
+			};
 			
 			this.setAggregation("_popover", oRpop);
 			
@@ -82,19 +90,22 @@ sap.ui.define(
 			
 			oFeedIn.addEventDelegate({
     			onsapenter: function(oEvent) {
-    				var sTxt = oFeedIn.getValue(); 
-    				oFeedIn.fireEvent("post", {
-						value: sTxt
-					});
-					oFeedIn.setValue(null); 
+    				
+    				oEvent.preventDefault();
+    				
+    				var sTxt = oFeedIn.getValue();
+    				if(sTxt.length > 0){
+	    				oFeedIn.fireEvent("post", {
+							value: sTxt
+						}, true, false);
+						oFeedIn.setValue(null); 
+    				}
+					
 			    }
 			});
 			
 			var oFeedList = new List(this.getId() + "-bkChatList", {
-				growing: true,
-				height: "100%",
-				showSeparators: "None",
-				items: this.getAggregation("_feedListItem")
+				showSeparators: "None"
 			});
 			
 			
@@ -106,7 +117,7 @@ sap.ui.define(
 			oFeedList.addItem(oInitialFeedListItem);
 			
 			var oScroll = new ScrollContainer(this.getId() + "-bkChatScroll", {
-				height: "100%",
+				
 				horizontal: false,
 				vertical: true,
 				focusable: true
@@ -115,7 +126,7 @@ sap.ui.define(
 			oScroll.insertContent(oFeedList);
 			
 			var oVBox = new VBox({
-				height: "100%",
+				
 				items: [oScroll, oFeedIn],
 				fitContainer: true,
 				justifyContent : "End",
@@ -145,6 +156,7 @@ sap.ui.define(
             if(sap.ui.core.Control.prototype.onAfterRendering) {
              sap.ui.core.Control.prototype.onAfterRendering.apply(this,args);
             }
+            this._saveDimensions();
         },
         
         setTitle: function(sTitle){
@@ -152,15 +164,20 @@ sap.ui.define(
         	sap.ui.getCore().byId(this.getId() + "-bkChatTitle").setText(sTitle);
         },
         
-        // setHeight: function(sHeight){
-        // 	this.setProperty("height", sHeight, true);
-        // 	this.getAggregation("_popover").setContentHeight(sHeight);
-        // },
         
-        // setWidth: function(sWidth){
-        // 	this.setProperty("width", sWidth, true);
-        // 	this.getAggregation("_popover").setContentHeight(sWidth);
-        // },
+        setHeight: function(sHeight){
+        	this.setProperty("height", sHeight, true);
+        	sap.ui.getCore().byId(this.getId() + "-bkChatPop").setContentHeight(sHeight);
+        	
+        	var iScrollHeight = sHeight.substring(0, sHeight.length - 2) - "96px".substring(0, "96px".length - 2);
+        	sap.ui.getCore().byId(this.getId() + "-bkChatScroll").setHeight(iScrollHeight + "px");
+        },
+        
+        setWidth: function(sWidth){
+        	this.setProperty("width", sWidth, true);
+        	sap.ui.getCore().byId(this.getId() + "-bkChatPop").setContentWidth(sWidth);
+        },
+        
         
         setUserIcon: function(sUserIcon){
         	this.setProperty("userIcon", sUserIcon, true);
@@ -192,13 +209,21 @@ sap.ui.define(
 			var sText = oEvent.getSource().getValue();
 			this.addChatItem(sText, true);
 			this.fireEvent("send", {
-				value: sText
+				text: sText
 			}, false, true);
         	
         },
         
         _onOpenChat: function(oEvent){
         	this.getAggregation("_popover").openBy(this.getAggregation("_chatButton"));
+        	this.getAggregation("_popover").setContentHeight(this.getProperty("height"));
+        	this.getAggregation("_popover").setContentWidth(this.getProperty("width"));
+    		//resave the parameters when a resize is done
+        },
+        
+        _saveDimensions: function(oEvent){
+        	this.setProperty("height", this.getAggregation("_popover").getContentHeight(), true);
+        	this.setProperty("width", this.getAggregation("_popover").getContentHeight(), true);
         },
         
         _toggleAutoClose: function(oEvent){
@@ -224,19 +249,17 @@ sap.ui.define(
 			if(bUser){
 				oFeedListItem.setIcon(this.getUserIcon());
 				oFeedListItem.addStyleClass("bkUserInput");
+				sap.ui.getCore().byId(this.getId() + "-bkChatList").addItem(oFeedListItem, 0);
 			}else{
 				oFeedListItem.setIcon(this.getRobotIcon());
 				oFeedListItem.addStyleClass("bkRobotInput");
+				sap.ui.getCore().byId(this.getId() + "-bkChatList").addItem(oFeedListItem, 0);
+				sap.ui.getCore().byId(this.getId() + "-bkChatScroll").scrollTo(0, 1000, 0);
 			}
-			sap.ui.getCore().byId(this.getId() + "-bkChatList").addItem(oFeedListItem, 0);
 			
-			var scrollToInput = document.getElementById(oFeedListItem.getId());
-			sap.ui.getCore().byId(this.getId() + "-bkChatScroll").scrollTo(0, 1000, 0);
+	
 			
-			//sap.ui.getCore().byId(this.getId() + "-bkChatScroll").scrollToElement(scrollToInput);
-			
-			
-        },
+        }
  
         
 	});

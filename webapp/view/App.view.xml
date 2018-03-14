@@ -1,17 +1,16 @@
-<mvc:View controllerName="i027737Controls.controller.App" 
+<mvc:View controllerName="sap.i027737.Node.controller.App" 
 	xmlns:html="http://www.w3.org/1999/xhtml" 
 	xmlns:mvc="sap.ui.core.mvc"
-	xmlns:controls="i027737Controls.controls"
-	displayBlock="true" 
-	xmlns="sap.m">
-	<App>
+	xmlns:controls="sap.i027737.Node.controls"
+	displayBlock="true" xmlns="sap.m">
+	<App id="idAppControl">
 		<pages>
 			<Page title="{i18n>title}">
 				<content>
 					<controls:ChatDialog id="brianchat" 
 										title="Chat"
-										height="222px"
-										width="111px"
+										height="600px"
+										width="350px"
 										showCloseButton="true"
 										send="onSendPressed"
 										initialMessage="hello wha dup?"
@@ -21,13 +20,8 @@
 										buttonIcon="sap-icon://discussion">
 										
 					</controls:ChatDialog>
-					
 				</content>
-
 			</Page>
 		</pages>
 	</App>
 </mvc:View>
-
-
-						

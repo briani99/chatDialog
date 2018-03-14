@@ -3,18 +3,40 @@ sap.ui.define([
 ], function(Controller) {
 	"use strict";
 
-	return Controller.extend("i027737Controls.controller.App", {
-			
+	return Controller.extend("sap.i027737.Node.controller.App", {
+		
 		onSendPressed: function(oEvent){
-			var question = oEvent.getParameter("text");
-			
-			//Here is where we need to call the server and get a response to our question
-			
-			var response = "Sorry, u want what.. WTF";
 			
 			var chatbot = this.getView().byId("brianchat");
-			chatbot.addChatItem(response, false);                        
-		}
+			var question = oEvent.getParameter("text");
 			
+			var payload = {
+				content: question
+			};
+			
+			jQuery.ajax({
+				url: "/chat",
+				cache: false,
+				type: "POST",
+				headers: {
+					"Accept": "application/json",
+					"Content-Type": "application/json",
+					
+				},
+				data: JSON.stringify(payload),
+				async: true,
+				success: function(sData) {
+					
+					chatbot.addChatItem(sData.content, false);           
+					
+				},
+				error: function(sError) {
+					
+					chatbot.addChatItem("Sorry im malfunctioning", false);      
+				}
+			});
+			
+		}
+
 	});
 });

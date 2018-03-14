@@ -1,11 +1,11 @@
 sap.ui.define([
 	"sap/ui/core/UIComponent",
 	"sap/ui/Device",
-	"i027737Controls/model/models"
+	"sap/i027737/Node/model/models"
 ], function(UIComponent, Device, models) {
 	"use strict";
 
-	return UIComponent.extend("i027737Controls.Component", {
+	return UIComponent.extend("sap.i027737.Node.Component", {
 
 		metadata: {
 			manifest: "json"
@@ -19,6 +19,9 @@ sap.ui.define([
 		init: function() {
 			// call the base component's init function
 			UIComponent.prototype.init.apply(this, arguments);
+
+			// enable routing
+			this.getRouter().initialize();
 
 			// set the device model
 			this.setModel(models.createDeviceModel(), "device");
