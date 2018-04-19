@@ -13,6 +13,11 @@ sap.ui.define([
 			var payload = {
 				content: question
 			};
+
+			var _id = localStorage.getItem("chatId");
+			if (_id != undefined){
+				payload.id = _id;
+			}
 			
 			jQuery.ajax({
 				url: "/chat",
@@ -27,7 +32,8 @@ sap.ui.define([
 				async: true,
 				success: function(sData) {
 					
-					chatbot.addChatItem(sData.content, false);           
+					chatbot.addChatItem(sData.content, false);
+					localStorage.setItem("chatId", sData.id);
 					
 				},
 				error: function(sError) {
