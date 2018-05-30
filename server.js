@@ -15,6 +15,7 @@ const RELEASE_ALL = 16;
 const PRODUCT_SF = 32;
 const PRODUCT_ALL = 64;
 const GREETING = 128;
+const INTENT_FILTER = 256;
 
 ////////////////////
 // Config Express //
@@ -78,81 +79,40 @@ function handleMessage(data, res){
     var oResponse = {};
     oResponse.id = oContext.id;
 
-    var sIntent = firstEntityValue(data.entities, "intent");
-    var sRelease = firstEntityValue(data.entities, "release");
-    var sProduct = firstEntityValue(data.entities, "product");
     var sGreeting = firstEntityValue(data.entities, "greetings");
+    var sIntent = firstEntityValue(data.entities, "intent");
+    var sProduct = firstEntityValue(data.entities, "product");
+    var sModule = firstEntityValue(data.entities, "module");
 
-    if(sIntent && sIntent === "innovation"){
-        addContextItem(INTENT_INOVATION);
-    }
-    if(sRelease && sRelease === "current release"){
-        addContextItem(RELEASE_CURRENT);
-    }else if (sRelease){
-        addContextItem(RELEASE_ALL);
+
+    if(sGreeting && sGreeting === "true" ){
+        oResponse.content = "Hello, I can help you filter the CAA Tool.";
+        return res.send(oResponse);
     }
     if(sProduct && sProduct === "Success Factors"){
-        addContextItem(PRODUCT_SF)
-    }else if (sProduct){
-        addContextItem(PRODUCT_ALL);
-    }
-    if(sGreeting && sGreeting === "true" ){
-        addContextItem(GREETING)
-    }
-
-    var iContextValue;
-    if(oContext.oChatSet && oContext.oChatSet.size > 0){
-        var iContextValue = (Array.from(oContext.oChatSet)).reduce((a, b) => a + b);
-    }else{
-        iContextValue = 0;
+        if(sModule && sModule != ""){
+            oResponse.content = "Ok I will filter the fetures list to show only items for " + sModule;
+            oResponse.filterModule = sModule;
+            return res.send(oResponse);
+        }else{
+            oResponse.content = "What module would you like to filter success factors?";
+            return res.send(oResponse);
+        }
     }
 
-
-    switch (iContextValue) {
-        case 0:
-            oResponse.content = "I can help you find what you want,  what would you like to see";
-            break;
-        case INTENT_INOVATION:
-            oResponse.content = "Can you tell me for what releases?";
-            break;
-        case INTENT_INOVATION + RELEASE_CURRENT:
-            oResponse.content = "Ok for the current release, Do you what to filter by product also?";
-            break;
-        case INTENT_INOVATION + RELEASE_PREVIOUS:
-            oResponse.content = "Ok for the previous release, Do you what to tell me what product?";
-            break;
-        case INTENT_INOVATION + PRODUCT_ALL:
-            oResponse.content = "Ok All products, but for what release?";
-            break;
-        case INTENT_INOVATION + PRODUCT_SF:
-            oResponse.content = "Ok for success factors, Do you what to tell me what release?";
-            break;
-        case INTENT_INOVATION + RELEASE_CURRENT + PRODUCT_ALL:
-            oResponse.content = "Ok, I can filter the current release for all products";
-            oResponse.navTo = "#/PRODUCT/100/REL/Q2";
-            break;
-        case INTENT_INOVATION + RELEASE_CURRENT + PRODUCT_SF:
-            oResponse.content = "Ok, I can filter the current release for successfactors";
-            oResponse.navTo = "#/PRODUCT/100/REL/Q2";
-            break;
-        case INTENT_INOVATION + RELEASE_ALL + PRODUCT_ALL:
-            oResponse.content = "Ok, I can filter all releases for all products";
-            oResponse.navTo = "#/PRODUCT/100/REL/Q2";
-            break;
-        case INTENT_INOVATION + RELEASE_ALL + PRODUCT_SF:
-            oResponse.content = "Ok, I can filter all releases for successfactors";
-            oResponse.navTo = "#/PRODUCT/100/REL/Q2";
-            break;
-        case GREETING:
-            removeContextItem(GREETING);
-            oResponse.content = "Hello, how can I help?";
-            break;
-        default: 
-            oResponse.content  = "lets start again,  I can help filter the CAA, just tell me what you would like to see";
-
+    if(sIntent && sIntent === "filter"){
+        if(sModule && sModule != ""){
+            oResponse.content = "Ok I will filter the fetures list to show only items for " + sModule;
+            oResponse.filterModule = sModule;
+            return res.send(oResponse);
+        }else{
+            oResponse.content = "Can you tell me for which module? ";
+            return res.send(oResponse);
+        }
     }
-
-    res.send(oResponse);
+    oResponse.content = "I can help you filter the feature list, what module would you like to filter?";
+    return res.send(oResponse);
+    
 };
 
 
@@ -166,7 +126,7 @@ function firstEntityValue(entities, entity) {
       return null;
     }
     return val;
-  };
+};
 
 function addContextItem(iNum){
     oContext.oChatSet.add(iNum);
