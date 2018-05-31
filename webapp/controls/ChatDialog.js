@@ -254,6 +254,7 @@ sap.ui.define(
 				oFeedListItem.addStyleClass("bkRobotInput");
 				sap.ui.getCore().byId(this.getId() + "-bkChatList").addItem(oFeedListItem, 0);
 			}
+			var oScroll = sap.ui.getCore().byId(this.getId() + "-bkChatScroll");
 			setTimeout(function(){ 
 				oScroll.scrollTo(0, 1000, 0);
 			}, 0);
